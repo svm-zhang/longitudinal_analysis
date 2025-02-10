@@ -1,0 +1,4 @@
+marker	trt_group_effect_pvalue	day22_day8_diff_pvalue	significance_trt_group_effect	significance_day22_day8_diff
+C4	0.240699704880556	0.0424600008977945	no	yes
+C8	0.190694734049032	0.479923203253522	no	no
+TG	0.784322998380479	0.922523531503077	no	no
