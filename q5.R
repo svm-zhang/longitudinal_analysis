@@ -38,7 +38,8 @@ ifnb <- FindVariableFeatures(ifnb, selection.method = "vst")
 ifnb <- ScaleData(ifnb)
 ifnb <- RunPCA(ifnb)
 # review the elbow plot and determine number of components
-ElbowPlot(ifnb)
+m <- ElbowPlot(ifnb)
+ggsave(file.path(plot_dir, "pca.elbow.pdf"), m, height=12, width=16)
 n_components <- 15
 # cluster cells regardless of condition, a.k.a no integration
 ifnb <- FindNeighbors(ifnb, dims = 1:n_components)
@@ -46,7 +47,7 @@ ifnb <- FindClusters(ifnb, resolution = 2, cluster.name = "unintegrated_clusters
 ifnb <- RunUMAP(ifnb, dims = 1:n_components, reduction.name = "umap.unintegrated")
 
 # integrate same cell types from the 2 conditions
-print("Integrate cell types from 2 control and interferon stimulated groups.")
+print("Integrate cell types from control and interferon stimulated groups.")
 ifnb <- IntegrateLayers(
   object = ifnb,
   method = CCAIntegration, orig.reduction = "pca",
