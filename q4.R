@@ -15,6 +15,17 @@ if (! dir.exists(plot_dir)) {
   dir.create(plot_dir)
 }
 
+# function to identify DEGs between specified clusters.
+find_degs_between_clusters <- function(obj, c1, c2) {
+  dt <- as.data.table(
+    FindMarkers(obj, ident.1 = c1, ident.2 = c2, only.pos=TRUE),
+    keep.rownames=TRUE
+  )
+  names(dt)[1] <- "gene"
+  # I would also look at fold change in addition to p value in real practice.
+  dt[p_val_adj <= 0.05]
+}
+
 # Load the data
 data_folder <- "./filtered_gene_bc_matrices/hg19/"
 data <- Read10X(data.dir = data_folder)
@@ -105,4 +116,32 @@ pbmc <- subset(
     (GenePerUMI >= 0.8)
 )
 saveRDS(file = "q4.rds", pbmc)
+
+pbmc <- NormalizeData(pbmc)
+pbmc <- FindVariableFeatures(pbmc, selection.method = "vst")
+pbmc <- ScaleData(pbmc, features = rownames(pbmc))
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc))
+# determine number of components
+m <- ElbowPlot(pbmc)
+ggsave(file.path(plot_dir, "pca.elbow.pdf"), m, height=12, width=16)
+n_components <- 9
+
+pbmc <- FindNeighbors(pbmc, dims = 1:n_components)
+pbmc <- FindClusters(pbmc, resolution = 0.5)
+pbmc <- RunUMAP(pbmc, dims = 1:n_components)
+m <- DimPlot(pbmc, reduction = "umap")
+ggsave(file.path(plot_dir, "cell.cluster.umap.pdf"), m, height=12, width=16)
+
+# identify DEGs that differ between cluster 8 and 2. 
+deg_res_clusters_dt <- find_degs_between_clusters(pbmc, 8, 2)
+
+# if the purpose is to identify DEGs between one cell cluster versus all
+# remaining cluster, use the following.
+deg_one_vs_all_dt <- as.data.table(
+  FindAllMarkers(pbmc, only.pos = TRUE), keep.rownames=TRUE
+)
+names(deg_one_vs_all_dt)[1] <- "gene"
+# names(deg_one_vs_all_dt)
+# p_val, avg_log2FC, pct.1, pct.2, p_val, p_val_adj, cluster, gene
+deg_one_vs_all_dt <- deg_one_vs_all_dt[p_val_adj <= 0.05]
 
