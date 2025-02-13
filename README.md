@@ -7,6 +7,7 @@
 - lmerTest: 3.1-3
 - emmeans: 1.10.7
 - Seurat: 5.2.1
+- Seuratdata (installed from github repo)
 
 ## Data
 
@@ -29,6 +30,7 @@ A public available 10x single-cell PBMC dataset is deposited in the `filtered_ge
 - If running in Rstudio, it is recommended to clear memory first.
 - I wrote comments to describe what each step does, including my thought process.
 - I included a `expect_output` folder in which result tables and plots can be found.
+- For running Q4 and Q5, it takes a bit time to finish.
 
 ## Q1
 
@@ -56,3 +58,13 @@ A public available 10x single-cell PBMC dataset is deposited in the `filtered_ge
 
 - `q4.rds`: RDS file with `pbmc` Seurat object after filtration based on QC criteria. Should be ready to be loaded using `readRDS()` function.
 - `sc_plots`: folder with plots to help guide the decision of QC criteria.
+- note: I did not include the result of DEGs in the RDS file. The code supports to identify:
+  - DEGs between any given clusters.
+  - DEGs between one cluster versus all the others.
+
+## Q5
+
+`q5.R` script generates:
+
+- `q5.deg.rds`: RDS file with a list object in which the result of DEGs compared between control and stimulation for each cluster can be found.
+- `q5_plots`: folder with plots to demonstrate integration.
